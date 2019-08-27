@@ -1,0 +1,27 @@
+{
+  "name": "dos-filesystem-js",
+  "version": "0.0.1",
+  "main": "index.js",
+  "description": "library for using File System.",
+  "repository": "https://github.com/kouzouman/dos-filesystem-js.git",
+  "author": "kouzouman <check@doers-square.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "jest": "^24.9.0"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "./node_modules/.bin/babel src --out-dir dist"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": false
+  },
+  "dependencies": {
+    "dos-array-js": "^0.0.6"
+  }
+}
