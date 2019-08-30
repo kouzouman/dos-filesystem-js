@@ -86,7 +86,7 @@ export default class DosFileSystem {
    * @param {String} path
    */
   static async readText(path, encode = 'utf8') {
-    if (!(await FileSystem.isFileExist(path))) return ''
+    if (!(await DosFileSystem.isFileExist(path))) return ''
     return fs.readFileSync(path, encode)
   }
 
