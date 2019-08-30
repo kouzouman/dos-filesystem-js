@@ -30,23 +30,18 @@ class DosFileSystem {
     // ファイルリスト取得
     const files = await DosFileSystem._readDirPromise(path);
     const fnames = [];
-    files.forEach(v => fnames.push(path + '/' + v)); // console.log(fnames)
-    //  ステートを取得
+    files.forEach(v => fnames.push(path + '/' + v)); //  ステートを取得
 
     const info = await fnames.asyncMap(async f => {
-      const stats = await DosFileSystem.getfileState(f); // console.log(stats)
-
+      const stats = await DosFileSystem.getfileState(f);
       let children = [];
-      if (stats.isDirectory() && isDeep) children = await DosFileSystem.getFileList(f); // console.log(children)
-
+      if (stats.isDirectory() && isDeep) children = await DosFileSystem.getFileList(f);
       return {
         item: f,
         stats: stats,
         children: children
       };
     });
-    console.log('info -------');
-    console.log(info);
     return info;
   }
   /**
@@ -92,23 +87,25 @@ class DosFileSystem {
     } catch (e) {
       return false;
     }
-  } // /**
-  //  * ファイルからテキスト情報を取得
-  //  * @param {String} path
-  //  */
-  // static async readText(path, encode = 'utf8') {
-  //   if (!(await FileSystem.isFileExist(path))) return ''
-  //   return fs.readFileSync(path, encode)
-  // }
-  // static readTextPromise(path, encode) {
-  //   return new Promise((resolve, reject) => {
-  //     fs.readFile(path, encode, (err, data) => {
-  //       if (!err) resolve(data)
-  //       else reject(err)
-  //     })
-  //   })
-  // }
+  }
+  /**
+   * ファイルからテキスト情報を取得
+   * @param {String} path
+   */
 
+
+  static async readText(path, encode = 'utf8') {
+    if (!(await FileSystem.isFileExist(path))) return '';
+    return fs.readFileSync(path, encode);
+  }
+
+  static readTextPromise(path, encode) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(path, encode, (err, data) => {
+        if (!err) resolve(data);else reject(err);
+      });
+    });
+  }
 
 }
 

@@ -81,21 +81,21 @@ export default class DosFileSystem {
     }
   }
 
-  // /**
-  //  * ファイルからテキスト情報を取得
-  //  * @param {String} path
-  //  */
-  // static async readText(path, encode = 'utf8') {
-  //   if (!(await FileSystem.isFileExist(path))) return ''
-  //   return fs.readFileSync(path, encode)
-  // }
+  /**
+   * ファイルからテキスト情報を取得
+   * @param {String} path
+   */
+  static async readText(path, encode = 'utf8') {
+    if (!(await FileSystem.isFileExist(path))) return ''
+    return fs.readFileSync(path, encode)
+  }
 
-  // static readTextPromise(path, encode) {
-  //   return new Promise((resolve, reject) => {
-  //     fs.readFile(path, encode, (err, data) => {
-  //       if (!err) resolve(data)
-  //       else reject(err)
-  //     })
-  //   })
-  // }
+  static readTextPromise(path, encode) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(path, encode, (err, data) => {
+        if (!err) resolve(data)
+        else reject(err)
+      })
+    })
+  }
 }
