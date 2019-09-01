@@ -74,7 +74,8 @@ export default class DosFileSystem {
    */
   static async isFileExist(path) {
     try {
-      fs.getfileState(path)
+      const st = await DosFileSystem.getfileState(path)
+
       return true
     } catch (e) {
       return false
@@ -87,14 +88,12 @@ export default class DosFileSystem {
    */
   static async readText(path, encode = 'utf8') {
     if (!(await DosFileSystem.isFileExist(path))) return ''
-    return fs.readFileSync(path, encode)
-  }
-
-  static readTextPromise(path, encode) {
+    console.log('testpl')
     return new Promise((resolve, reject) => {
-      fs.readFile(path, encode, (err, data) => {
-        if (!err) resolve(data)
-        else reject(err)
+      console.log(path)
+      fs.readFile(path, { encoding: encode, flag: 'r' }, (err, data) => {
+        if (err) reject(err)
+        else resolve(data)
       })
     })
   }

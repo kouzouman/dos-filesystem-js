@@ -1,6 +1,6 @@
 {
   "name": "dos-filesystem-js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "description": "library for using File System.",
   "repository": "https://github.com/kouzouman/dos-filesystem-js.git",
