@@ -108,6 +108,20 @@ class DosFileSystem {
     });
   }
   /**
+   * ファイル削除
+   * @param {*} path
+   */
+
+
+  static async delete(path) {
+    return new Promise((resolve, reject) => {
+      fs.unlink(path, err => {
+        if (err) reject(error);
+        resolve(true);
+      });
+    });
+  }
+  /**
    * ファイルのBase64を取得する
    * @param {*} path
    */
