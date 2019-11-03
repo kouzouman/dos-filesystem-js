@@ -106,7 +106,30 @@ class DosFileSystem {
         if (err) reject(err);else resolve(data);
       });
     });
-  }
+  } // /**
+  //  * ファイルのオブジェクトを引数にファイルのmd5を取得
+  //  * @param {String} path
+  //  */
+  // static async filemd5(fileObj) {
+  //   return new Promise((resolve, reject) => {
+  //     try {
+  //       //FileReaderオブジェクトを生成
+  //       const fileReader = new FileReader()
+  //       //読み込み時に実行されるイベント
+  //       fileReader.onload = function() {
+  //         const res = fileReader.result
+  //         //MD5ハッシュ関数でハッシュ化
+  //         const hash = require('md5')(res)
+  //         resolve(hash)
+  //       }
+  //       //読み込みを開始する(ArrayBufferオブジェクトを得る)
+  //       fileReader.readAsArrayBuffer(fileObj)
+  //     } catch (e) {
+  //       reject(e)
+  //     }
+  //   })
+  // }
+
 
 }
 
