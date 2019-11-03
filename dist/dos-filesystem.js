@@ -95,16 +95,36 @@ class DosFileSystem {
 
 
   static async readText(path, encode = 'utf8') {
-    if (!(await DosFileSystem.isFileExist(path))) return '';
-    console.log('testpl');
+    if (!(await DosFileSystem.isFileExist(path))) return ''; // console.log('testpl')
+
     return new Promise((resolve, reject) => {
-      console.log(path);
+      // console.log(path)
       fs.readFile(path, {
         encoding: encode,
         flag: 'r'
       }, (err, data) => {
         if (err) reject(err);else resolve(data);
       });
+    });
+  }
+  /**
+   * ファイルのBase64を取得する
+   * @param {*} path
+   */
+
+
+  static async getBase64(path) {
+    return new Promise((resolve, reject) => {
+      try {
+        fs.readFile(path, 'base64', function (err, data) {
+          // console.log(data)
+          if (err) throw err;
+          resolve(data);
+        });
+      } catch (e) {
+        // console.log('error')
+        reject(e);
+      }
     });
   } // /**
   //  * ファイルのオブジェクトを引数にファイルのmd5を取得
