@@ -140,6 +140,26 @@ class DosFileSystem {
         reject(e);
       }
     });
+  }
+  /**
+   * ファイルのBase64を取得する
+   * @param {*} path
+   */
+
+
+  static async getBin(path) {
+    return new Promise((resolve, reject) => {
+      try {
+        fs.readFile(path, function (err, data) {
+          // console.log(data)
+          if (err) throw err;
+          resolve(data);
+        });
+      } catch (e) {
+        // console.log('error')
+        reject(e);
+      }
+    });
   } // /**
   //  * ファイルのオブジェクトを引数にファイルのmd5を取得
   //  * @param {String} path
