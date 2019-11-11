@@ -129,6 +129,24 @@ export default class DosFileSystem {
       }
     })
   }
+  /**
+   * ファイルのBase64を取得する
+   * @param {*} path
+   */
+  static async writeBase64(path, data) {
+    return new Promise((resolve, reject) => {
+      try {
+        var decode = new Buffer(data, 'base64')
+        fs.writeFile(path, decode, function(err) {
+          if (err) reject(false)
+          else resolve(true)
+        })
+      } catch (e) {
+        // console.log('error')
+        reject(false)
+      }
+    })
+  }
 
   /**
    * ファイルのBase64を取得する
