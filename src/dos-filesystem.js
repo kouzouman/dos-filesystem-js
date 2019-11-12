@@ -88,14 +88,39 @@ export default class DosFileSystem {
    */
   static async readText(path, encode = 'utf8') {
     if (!(await DosFileSystem.isFileExist(path))) return ''
+
     // console.log('testpl')
     return new Promise((resolve, reject) => {
       // console.log(path)
-      fs.readFile(path, { encoding: encode, flag: 'r' }, (err, data) => {
+      fs.readFile(path, { flag: 'r' }, (err, data) => {
+        if (encode.tolowerCase() == 'utf8') {
+          return resolve(data)
+        }
         if (err) reject(err)
-        else resolve(data)
+
+        const Encoding = require('encoding-japanese')
+
+        if (
+          ['sjis', 'shift-jis', 'shiftjis'].indexOf(encode.toLowerCase()) >= 0
+        ) {
+          const text = Encoding.convert(data, {
+            from: 'SJIS',
+            to: 'UNICODE',
+            type: 'string'
+          })
+          return resolve(text)
+        }
+
+        return resolve('未対応のエンコードです')
       })
     })
+  }
+
+  static async getFileEncode(path) {
+    const Encoding = require('encoding-japanese')
+    const fileBin = await fs.getBin(target.item)
+    // console.log(fileBin)
+    target.encode = Encoding.detect(fileBin)
   }
 
   /**
