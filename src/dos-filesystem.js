@@ -93,7 +93,7 @@ export default class DosFileSystem {
     return new Promise((resolve, reject) => {
       // console.log(path)
       fs.readFile(path, { flag: 'r' }, (err, data) => {
-        if (encode.tolowerCase() == 'utf8') {
+        if (encode.toLowerCase() == 'utf8') {
           return resolve(data)
         }
         if (err) reject(err)
