@@ -101,7 +101,7 @@ export default class DosFileSystem {
         const Encoding = require('encoding-japanese')
 
         if (
-          ['sjis', 'shift-jis', 'shiftjis', 'UNICODE'].indexOf(
+          ['sjis', 'shift-jis', 'shiftjis', 'unicode'].indexOf(
             encode.toLowerCase()
           ) >= 0
         ) {
