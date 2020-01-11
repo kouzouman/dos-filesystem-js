@@ -110,7 +110,7 @@ class DosFileSystem {
 
         const Encoding = require('encoding-japanese');
 
-        if (['sjis', 'shift-jis', 'shiftjis'].indexOf(encode.toLowerCase()) >= 0) {
+        if (['sjis', 'shift-jis', 'shiftjis', 'UNICODE'].indexOf(encode.toLowerCase()) >= 0) {
           const text = Encoding.convert(data, {
             from: 'SJIS',
             to: 'UNICODE',
