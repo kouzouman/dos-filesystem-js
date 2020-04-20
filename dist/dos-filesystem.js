@@ -8,6 +8,10 @@ exports.default = void 0;
 const fs = require('fs');
 
 require('dos-array-js');
+
+require('dos-string-js');
+
+const iconv = require('iconv-lite');
 /**
  * ファイルシステム関連操作のStatic
  */
@@ -67,10 +71,11 @@ class DosFileSystem {
     return new Promise((resolve, reject) => {
       try {
         fs.stat(file, (err, stats) => {
-          if (!err) resolve(stats);else reject(err);
+          // console.log({ err, stats })
+          if (!err) return resolve(stats);else return reject(err);
         });
       } catch (e) {
-        reject(e);
+        return reject(e);
       }
     });
   }
@@ -82,11 +87,15 @@ class DosFileSystem {
 
   static async isFileExist(path) {
     try {
-      const st = await DosFileSystem.getfileState(path);
-      return true;
+      const st = await DosFileSystem.getfileState(path); // console.log({ st, isFile: st.isFile(), isDir: st.isDirectory() })
+
+      if (st.isFile() || st.isDirectory()) return true;
+      return false;
     } catch (e) {
       return false;
     }
+
+    return false;
   }
   /**
    * ファイルからテキスト情報を取得
@@ -95,7 +104,7 @@ class DosFileSystem {
 
 
   static async readText(path, encode = 'utf8') {
-    if (!(await DosFileSystem.isFileExist(path))) return ''; // console.log('testpl')
+    if (!(await DosFileSystem.isFileExist(path))) return Promise.reject(''); // console.log('testpl')
 
     return new Promise((resolve, reject) => {
       // console.log(path)
@@ -106,20 +115,93 @@ class DosFileSystem {
           return resolve(data);
         }
 
-        if (err) reject(err);
+        if (err) return reject(err);
+
+        if (['sjis', 'shift-jis', 'shiftjis'].indexOf(encode.toLowerCase()) >= 0) {
+          const resultStr = iconv.decode(new Buffer.from(data), 'Shift-JIS');
+          return resolve(resultStr);
+        }
 
         const Encoding = require('encoding-japanese');
 
-        if (['sjis', 'shift-jis', 'shiftjis', 'unicode'].indexOf(encode.toLowerCase()) >= 0) {
-          const text = Encoding.convert(data, {
-            from: 'SJIS',
-            to: 'UNICODE',
-            type: 'string'
-          });
-          return resolve(text);
-        }
+        const res = Encoding.convert(data, {
+          from: encode,
+          to: 'UNICODE',
+          type: 'string'
+        });
+        return resolve(res);
+      });
+    });
+  }
+  /**
+   * テキスト書き出し
+   * @param {*} path
+   * @param {*} data
+   * @param {*} options
+   */
 
-        return resolve('未対応のエンコードです');
+
+  static async writeText(path, data, options = {}) {
+    const param = Object.assign({
+      encode: 'SJIS',
+      flag: 'w',
+      isNew: true
+    }, options);
+
+    if (['sjis', 'shift-jis', 'shiftjis'].indexOf(param.encode.toLowerCase()) >= 0) {
+      // // ファイルが存在して新規の場合削除
+      // if (await DosFileSystem.isFileExist(path)) {
+      //   console.log('ファイル有り')
+      //   if (param.isNew) {
+      //     const delfFile = await DosFileSystem.delete(path)
+      //     console.log(delfFile)
+      //     if (delfFile !== true) throw '既存ファイルの削除に失敗しました'
+      //   }
+      // } else {
+      //   console.log('ファイルなし')
+      // }
+      // // ファイル書き出しのための下準備
+      // if ((await DosFileSystem.isFileExist(path)) == false) {
+      //   const nf = await new Promise((resolve, reject) => {
+      //     fs.writeFile(path, '', (err) => (!!err ? reject(err) : resolve(true)))
+      //   })
+      //   // console.log(nf)
+      //   if (nf !== true) throw 'ファイル書き出しのための下準備に失敗しました'
+      //   console.log('ファイル作った')
+      // }
+      const resBuff = iconv.encode(data, 'Shift-JIS');
+      return new Promise((resolve, reject) => {
+        fs.open(path, param.isNew ? 'w' : 'a', (err, fd) => {
+          if (!!err) {
+            return reject(err);
+          }
+
+          fs.write(fd, resBuff, 0, resBuff.length, (werr, rb) => {
+            if (!!werr) return reject(werr);else return resolve(true);
+          });
+        });
+      });
+    } else {
+      const writeFunc = param.isNew ? fs.writeFile : fs.appendFile;
+      return new Promise((resolve, reject) => {
+        writeFunc(path, data, param, (err, data) => {
+          if (err) return reject(err);else return resolve(data);
+        });
+      });
+    }
+  }
+  /**
+   * ファイルを移動させる
+   * @param {*} fromPath
+   * @param {*} toPath
+   */
+
+
+  static async move(fromPath, toPath, isCopy = fale) {
+    const func = isCopy ? fs.copyFile : fs.rename;
+    return new Promise((resolve, reject) => {
+      func(fromPath, toPath, err => {
+        if (err) return reject(err);else return resolvetrue;
       });
     });
   }
@@ -137,11 +219,35 @@ class DosFileSystem {
    */
 
 
-  static async delete(path) {
-    return new Promise((resolve, reject) => {
+  static async delete(path, isDeep = false) {
+    if (!isDeep) return new Promise((resolve, reject) => {
       fs.unlink(path, err => {
-        if (err) reject(error);
-        resolve(true);
+        if (err) return reject(err);else return resolve(true);
+      });
+    });else return new Promise((resolve, reject) => {
+      var fsExtra = require('fs-extra');
+
+      fsExtra.remove(path, err => {
+        if (err) return reject(err);else return resolve(true);
+      });
+    });
+  }
+  /**
+   * ディレクトリを作成
+   * @param {*} path
+   * @param {*} option
+   */
+
+
+  static async createDirectory(path, option = {}) {
+    const opt = Object.assign({
+      recursive: true
+    }, option);
+    const createPath = path;
+    if (await DosFileSystem.isFileExist(createPath)) return true;
+    return new Promise((resolve, reject) => {
+      fs.mkdir(createPath, opt, err => {
+        if (!!err) return reject(err);else return resolve(true);
       });
     });
   }
@@ -203,30 +309,20 @@ class DosFileSystem {
         reject(e);
       }
     });
-  } // /**
-  //  * ファイルのオブジェクトを引数にファイルのmd5を取得
-  //  * @param {String} path
-  //  */
-  // static async filemd5(fileObj) {
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       //FileReaderオブジェクトを生成
-  //       const fileReader = new FileReader()
-  //       //読み込み時に実行されるイベント
-  //       fileReader.onload = function() {
-  //         const res = fileReader.result
-  //         //MD5ハッシュ関数でハッシュ化
-  //         const hash = require('md5')(res)
-  //         resolve(hash)
-  //       }
-  //       //読み込みを開始する(ArrayBufferオブジェクトを得る)
-  //       fileReader.readAsArrayBuffer(fileObj)
-  //     } catch (e) {
-  //       reject(e)
-  //     }
-  //   })
-  // }
+  }
+  /**
+   * ファイルパスからファイル名を取得
+   * @param {*} path
+   * @param {*} isIncludeExp
+   */
 
+
+  static getFileName(path, isIncludeExp = true) {
+    const pathSplite = path.replaceAll('/', '\\').split('\\');
+    if (isIncludeExp) return pathSplite[pathSplite.length - 1];
+    const fileNameSplite = pathSplite[pathSplite.length - 1].split('.');
+    return fileNameSplite.slice(0, fileNameSplite.length - 1).join('.');
+  }
 
 }
 
