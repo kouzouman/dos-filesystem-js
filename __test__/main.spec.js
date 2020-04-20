@@ -50,6 +50,38 @@ test('readText2', async (done) => {
   done()
 })
 
+test('readTextByLine', async (done) => {
+  const current = __dirname + '/'
+  const target = current + 'testdir' + '/dir3/longLineText.txt'
+
+  const file = target
+
+  const kotae = await DosFileSystem.readText(file, 'sjis')
+  const kotaeLine = kotae.replaceAll('\r', '').split('\n')
+
+  DosFileSystem.readTextByLine(
+    file,
+    'sjis',
+    async (data, index) => {
+      // console.log({ index, data })
+      expect(data == kotaeLine[index]).toBe(true)
+      return Promise.resolve(true)
+    },
+    async (length) => {
+      // console.log(length)
+      // console.log(kotaeLine)
+      // console.log(kotaeLine.length)
+      expect(length == kotaeLine.length).toBe(true)
+      return Promise.resolve(true)
+    }
+  )
+
+  // console.log('data')
+  // console.log(data)
+
+  done()
+})
+
 test('writeText', async (done) => {
   const current = __dirname + '/'
   const target = current + 'testdir' + '/dir3/test.txt'
@@ -102,7 +134,7 @@ test('getbase64', async (done) => {
   const files = await DosFileSystem.getFileList(target, false)
 
   const file = files.filter((v) => v.stats.isFile())[0]
-  console.log(file)
+  // console.log(file)
 
   const b64 = await DosFileSystem.getBase64(file.item)
   // console.log(b64)

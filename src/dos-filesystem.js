@@ -2,6 +2,7 @@ const fs = require('fs')
 require('dos-array-js')
 require('dos-string-js')
 const iconv = require('iconv-lite')
+const byline = require('byline')
 
 /**
  * ファイルシステム関連操作のStatic
@@ -14,13 +15,6 @@ export default class DosFileSystem {
    * @param {Boolean} isIncludeFilePath ファイルパスを含めるかどうか
    */
   static async getFileList(path, isDeep = false) {
-    // /**
-    //  * key、valueの配列をMapに変更
-    //  */
-    // Array.prototype.asyncMap2 = async function(mapFunc) {
-    //   return Promise.all(this.map(v => mapFunc(v)))
-    // }
-
     // ファイルリスト取得
     const files = await DosFileSystem._readDirPromise(path)
     const fnames = []
@@ -120,6 +114,40 @@ export default class DosFileSystem {
 
         return resolve(res)
       })
+    })
+  }
+
+  /**
+   * 1行ごとファイル読み込み
+   * @param {*} path
+   * @param {*} encode
+   */
+  static readTextByLine(path, options, readFunc, endFunc) {
+    const param = Object.assign({ encode: 'SJIS' }, options)
+    var fs = require('fs'),
+      byline = require('byline')
+
+    let reader = null
+    if (
+      ['sjis', 'shift-jis', 'shiftjis'].indexOf(param.encode.toLowerCase()) >= 0
+    ) {
+      reader = fs.createReadStream(path).pipe(iconv.decodeStream('Shift_JIS'))
+    } else {
+      reader = fs.createReadStream(path, { encoding: 'utf-8' })
+    }
+
+    const stream = byline(reader)
+
+    // 現在の行数を管理
+    let index = 0
+
+    stream.on('data', async (line) => {
+      index++
+      if (!!readFunc) await readFunc(line, index - 1)
+    })
+
+    stream.on('end', async () => {
+      if (!!endFunc) await endFunc(index)
     })
   }
 
