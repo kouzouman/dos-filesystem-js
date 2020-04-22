@@ -107,10 +107,9 @@ class DosFileSystem {
       fs.readFile(path, {
         flag: 'r'
       }, (err, data) => {
-        if (encode.toLowerCase() == 'utf8') {
-          return resolve(data);
-        }
-
+        // if (encode.toLowerCase() == 'utf8') {
+        //   return resolve(data)
+        // }
         if (err) return reject(err);
 
         if (['sjis', 'shift-jis', 'shiftjis'].indexOf(encode.toLowerCase()) >= 0) {
