@@ -177,7 +177,10 @@ class DosFileSystem {
       encode: 'SJIS',
       flag: 'w',
       isNew: true
-    }, options);
+    }, options); //  フォルダがなければ作成する
+
+    const dirPath = path.replaceAll('\\', '/').deleteFromEnd('/');
+    await DosFileSystem.createDirectory(dirPath);
 
     if (['sjis', 'shift-jis', 'shiftjis'].indexOf(param.encode.toLowerCase()) >= 0) {
       // // ファイルが存在して新規の場合削除
@@ -228,11 +231,11 @@ class DosFileSystem {
    */
 
 
-  static async move(fromPath, toPath, isCopy = fale) {
+  static async move(fromPath, toPath, isCopy = false) {
     const func = isCopy ? fs.copyFile : fs.rename;
     return new Promise((resolve, reject) => {
       func(fromPath, toPath, err => {
-        if (err) return reject(err);else return resolvetrue;
+        if (err) return reject(err);else return resolve(true);
       });
     });
   }
@@ -256,11 +259,15 @@ class DosFileSystem {
         if (err) return reject(err);else return resolve(true);
       });
     });else return new Promise((resolve, reject) => {
-      var fsExtra = require('fs-extra');
-
-      fsExtra.remove(path, err => {
+      return fs.rmdir(path, {
+        recursive: true
+      }, err => {
         if (err) return reject(err);else return resolve(true);
-      });
+      }); // var fsExtra = require('fs-extra')
+      // fsExtra.remove(path, (err) => {
+      //   if (err) return reject(err)
+      //   else return resolve(true)
+      // })
     });
   }
   /**
@@ -309,6 +316,9 @@ class DosFileSystem {
 
 
   static async writeBase64(path, data) {
+    //  フォルダがなければ作成する
+    const dirPath = path.replaceAll('\\', '/').deleteFromEnd('/');
+    await DosFileSystem.createDirectory(dirPath);
     return new Promise((resolve, reject) => {
       try {
         var decode = new Buffer(data, 'base64');

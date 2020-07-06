@@ -127,6 +127,30 @@ test('writeText', async (done) => {
   done()
 })
 
+// test('writeText2', async (done) => {
+//   const current = __dirname + '/'
+//   const target = current + 'testdir' + '/dir4/test.txt'
+
+//   const files = await DosFileSystem.writeText(target, '髙橋高橋山﨑')
+//   // console.log(files)
+
+//   const ftext = await DosFileSystem.readText(target, 'sjis')
+//   // console.log(ftext)
+
+//   expect(ftext == '髙橋高橋山﨑').toBe(true)
+
+//   // expect(true).toBe(true)
+//   console.log('削除します')
+//   console.log(current + 'testdir' + '/dir4')
+
+//   const deleted2 = await DosFileSystem.delete(
+//     current + 'testdir' + '/dir4',
+//     false
+//   )
+
+//   done()
+// })
+
 test('getbase64', async (done) => {
   const current = __dirname + '/'
   const target = current + 'testdir'
