@@ -122,32 +122,42 @@ export default class DosFileSystem {
    * @param {*} path
    * @param {*} encode
    */
-  static readTextByLine(path, options, readFunc, endFunc) {
-    const param = Object.assign({ encode: 'SJIS' }, options)
-    var fs = require('fs'),
-      byline = require('byline')
+  static async readTextByLine(path, options, readFunc, endFunc) {
+    return new Promise((resolve, reject) => {
+      const param = Object.assign({ encode: 'SJIS' }, options)
+      var fs = require('fs'),
+        byline = require('byline')
 
-    let reader = null
-    if (
-      ['sjis', 'shift-jis', 'shiftjis'].indexOf(param.encode.toLowerCase()) >= 0
-    ) {
-      reader = fs.createReadStream(path).pipe(iconv.decodeStream('Shift_JIS'))
-    } else {
-      reader = fs.createReadStream(path, { encoding: 'utf-8' })
-    }
+      let reader = null
+      if (
+        ['sjis', 'shift-jis', 'shiftjis'].indexOf(param.encode.toLowerCase()) >=
+        0
+      ) {
+        reader = fs.createReadStream(path).pipe(iconv.decodeStream('Shift_JIS'))
+      } else {
+        reader = fs.createReadStream(path, { encoding: 'utf-8' })
+      }
 
-    const stream = byline(reader)
+      const stream = byline(reader)
 
-    // 現在の行数を管理
-    let index = 0
+      // 現在の行数を管理
+      let index = 0
 
-    stream.on('data', async (line) => {
-      index++
-      if (!!readFunc) await readFunc(line, index - 1)
-    })
+      stream.on('data', async (line) => {
+        index++
+        if (!!readFunc) await readFunc(line, index - 1)
+      })
 
-    stream.on('end', async () => {
-      if (!!endFunc) await endFunc(index)
+      stream.on('end', async () => {
+        try {
+          if (!!endFunc) await endFunc(index)
+        } catch (err) {
+          reject(err)
+          return
+        }
+        resolve(true)
+        return
+      })
     })
   }
 
