@@ -178,7 +178,7 @@ export default class DosFileSystem {
     )
 
     //  フォルダがなければ作成する
-    const dirPath = path.replaceAll('\\', '/').deleteFromEnd('/')
+    const dirPath = path.split('\\').join('/').deleteFromEnd('/')
     await DosFileSystem.createDirectory(dirPath)
 
     if (
@@ -329,7 +329,7 @@ export default class DosFileSystem {
    */
   static async writeBase64(path, data) {
     //  フォルダがなければ作成する
-    const dirPath = path.replaceAll('\\', '/').deleteFromEnd('/')
+    const dirPath = path.split('\\').join('/').deleteFromEnd('/')
     await DosFileSystem.createDirectory(dirPath)
 
     return new Promise((resolve, reject) => {
@@ -371,7 +371,7 @@ export default class DosFileSystem {
    * @param {*} isIncludeExp
    */
   static getFileName(path, isIncludeExp = true) {
-    const pathSplite = path.replaceAll('/', '\\').split('\\')
+    const pathSplite = path.split('/').join('\\').split('\\')
     if (isIncludeExp) return pathSplite[pathSplite.length - 1]
     const fileNameSplite = pathSplite[pathSplite.length - 1].split('.')
     return fileNameSplite.slice(0, fileNameSplite.length - 1).join('.')
