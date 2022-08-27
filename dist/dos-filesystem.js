@@ -243,6 +243,13 @@ class DosFileSystem {
 
   static async move(fromPath, toPath, isCopy = false) {
     const func = isCopy ? fs.copyFile : fs.rename;
+
+    if (toPath.lastIndexOf('.') > toPath.replaceAll('\\', '/').lastIndexOf('/')) {
+      await DosFileSystem.createDirectory(toPath.replaceAll('\\', '/').deleteFromEnd('/'));
+    } else {
+      await DosFileSystem.createDirectory(toPath);
+    }
+
     return new Promise((resolve, reject) => {
       func(fromPath, toPath, err => {
         if (err) return reject(err);else return resolve(true);
